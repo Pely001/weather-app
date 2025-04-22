@@ -1,15 +1,23 @@
-const KEY = "32976100515e39c6464b732c2b90fd75";
-const inputCity = document.querySelector(".city-input");
-const searchButton = document.querySelector(".search-button");
-
-function clickButton() {
-    const input = document.querySelector(".city-input").value;
-    citySearch(input);
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    } else {
+        alert("Geolocalização não é suportada pelo seu navegador.");
+    }
 }
 
-async function citySearch(city) {
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${KEY}&lang=pt_br&units=metric`;
+function successCallback(position) {
+    const { latitude, longitude } = position.coords;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${KEY}&lang=pt_br&units=metric`;
+    citySearchByCoords(apiUrl);
+}
 
+function errorCallback(error) {
+    console.error("Erro ao obter localização:", error);
+    alert("Não foi possível obter sua localização.");
+}
+
+async function citySearchByCoords(apiUrl) {
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -17,7 +25,7 @@ async function citySearch(city) {
         if (response.ok) {
             updateWeatherInfo(data);
         } else {
-            alert(`Não foi possível encontrar informações sobre a cidade: ${city}`);
+            alert("Não foi possível encontrar informações sobre sua localização.");
         }
     } catch (error) {
         console.error("Erro ao buscar dados da API:", error);
@@ -25,54 +33,5 @@ async function citySearch(city) {
     }
 }
 
-async function searchByLocation(lat, lon) {
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`;
-
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        if (response.ok) {
-            updateWeatherInfo(data);
-        } else {
-            alert("Não foi possível obter informações para sua localização.");
-        }
-    } catch (error) {
-        console.error("Erro ao buscar dados da API por localização:", error);
-        alert("Ocorreu um erro ao buscar a previsão do tempo para sua localização.");
-    }
-}
-
-function getUserLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                searchByLocation(latitude, longitude);
-            },
-            (error) => {
-                console.error("Erro ao obter localização:", error);
-                alert("Não foi possível obter sua localização. Por favor, insira a cidade manualmente.");
-            }
-        );
-    } else {
-        alert("Geolocalização não é suportada pelo seu navegador.");
-    }
-}
-
-function updateWeatherInfo(data) {
-    document.querySelector(".city").innerText = "Tempo em " + data.name;
-    document.querySelector(".temp").innerText = Math.floor(data.main.temp) + "° C";
-    document.querySelector(".weather-text").innerText = data.weather[0].description;
-    document.querySelector(".humidity").innerText = "Umidade " + data.main.humidity + "%";
-    document.querySelector(".img-weather").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
-}
-
-inputCity.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        clickButton();
-        console.log("Enter key pressed");
-    }
-});
-
-window.addEventListener("load", getUserLocation);
+// Chame a função getLocation() para pedir a localização ao carregar a página
+getLocation();
