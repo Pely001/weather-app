@@ -59,10 +59,36 @@ function getLocation() {
     }
 }
 
-function successCallback(position) {
+async function successCallback(position) {
     const { latitude, longitude } = position.coords;
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${KEY}&lang=pt_br&units=metric`;
-    citySearchByCoords(apiUrl);
+
+    // Chamada à API de geocodificação para obter o nome da cidade e o estado
+    const geoApiUrl = `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${KEY}`;
+    try {
+        const geoResponse = await fetch(geoApiUrl);
+        const geoData = await geoResponse.json();
+
+        if (geoData.length === 0) {
+            alert("Não foi possível obter informações sobre sua localização.");
+            return;
+        }
+
+        const { name, state } = geoData[0]; // Obtém o nome da cidade e o estado
+
+        // Chamada à API de clima para obter os dados do tempo
+        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${KEY}&lang=pt_br&units=metric`;
+        const weatherResponse = await fetch(weatherApiUrl);
+        const weatherData = await weatherResponse.json();
+
+        if (weatherResponse.ok) {
+            updateWeatherInfo(weatherData, name, state); // Passa o nome da cidade e o estado
+        } else {
+            alert("Não foi possível obter informações sobre o clima da sua localização.");
+        }
+    } catch (error) {
+        console.error("Erro ao buscar dados da API:", error);
+        alert("Ocorreu um erro ao buscar informações sobre sua localização.");
+    }
 }
 
 function errorCallback(error) {
