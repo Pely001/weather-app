@@ -8,26 +8,36 @@ function clickButton() {
 }
 
 async function citySearch(city) {
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${KEY}&lang=pt_br&units=metric`;
-
+    const geoApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${KEY}`;
     try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        const geoResponse = await fetch(geoApiUrl);
+        const geoData = await geoResponse.json();
 
-        if (response.ok) {
-            updateWeatherInfo(data);
+        if (geoData.length === 0) {
+            alert(`Não foi possível encontrar informações sobre a cidade: ${city}`);
+            return;
+        }
+
+        const { name, state, lat, lon } = geoData[0];
+        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`;
+
+        const weatherResponse = await fetch(weatherApiUrl);
+        const weatherData = await weatherResponse.json();
+
+        if (weatherResponse.ok) {
+            updateWeatherInfo(weatherData, name, state);
         } else {
             alert(`Não foi possível encontrar informações sobre a cidade: ${city}`);
         }
-
     } catch (error) {
         console.error("Erro ao buscar dados da API:", error);
         alert("Ocorreu um erro ao buscar a previsão do tempo.");
     }
 }
 
-function updateWeatherInfo(data) {
-    document.querySelector(".city").innerText = "Tempo em " + data.name;
+function updateWeatherInfo(data, cityName, state) {
+    const location = state ? `${cityName} - ${state}` : cityName;
+    document.querySelector(".city").innerText = "Tempo em " + location;
     document.querySelector(".temp").innerText = Math.floor(data.main.temp) + "° C";
     document.querySelector(".weather-text").innerText = data.weather[0].description;
     document.querySelector(".humidity").innerText = "Umidade " + data.main.humidity + "%";
@@ -75,6 +85,4 @@ async function citySearchByCoords(apiUrl) {
         alert("Ocorreu um erro ao buscar a previsão do tempo.");
     }
 }
-
-// Chame a função getLocation() para pedir a localização ao carregar a página
 getLocation();
