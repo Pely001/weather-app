@@ -1,6 +1,7 @@
 const KEY = "32976100515e39c6464b732c2b90fd75";
 const inputCity =  document.querySelector(".city-input");
 const searchButton = document.querySelector(".search-button");
+const suggestionsBox = document.querySelector(".suggestions-box"); // Crie um elemento no HTML para exibir as sugestões
 
 function clickButton() {
     const input = document.querySelector(".city-input").value;
@@ -51,6 +52,60 @@ inputCity.addEventListener("keydown", function(event) {
     }
 });
 
+inputCity.addEventListener("input", async function () {
+    const query = inputCity.value.trim();
+    console.log("Texto digitado:", query); // Verifica o texto digitado
+
+    if (query.length < 3) {
+        suggestionsBox.innerHTML = ""; // Limpa as sugestões se o texto for muito curto
+        return;
+    }
+
+    const geoApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${KEY}`;
+    console.log("URL da API:", geoApiUrl); // Verifica a URL gerada
+    try {
+        const response = await fetch(geoApiUrl);
+        const cities = await response.json();
+        console.log("Resposta da API:", cities); // Verifica a resposta da API
+
+        if (cities.length === 0) {
+            suggestionsBox.innerHTML = "<p>Nenhuma cidade encontrada.</p>";
+            return;
+        }
+
+        // Renderiza as sugestões
+        suggestionsBox.innerHTML = cities
+            .map(
+                (city) =>
+                    `<div class="suggestion-item" data-city="${city.name}" data-lat="${city.lat}" data-lon="${city.lon}" data-state="${city.state || ""}">
+                        ${city.name} - ${city.state || ""} (${city.country})
+                    </div>`
+            )
+            .join("");
+
+        // Adiciona evento de clique nas sugestões
+        document.querySelectorAll(".suggestion-item").forEach((item) => {
+            item.addEventListener("click", function () {
+                const cityName = this.getAttribute("data-city");
+                const state = this.getAttribute("data-state"); // Adiciona o estado
+                const lat = this.getAttribute("data-lat");
+                const lon = this.getAttribute("data-lon");
+
+                // Atualiza o campo de entrada e busca o clima
+                inputCity.value = `${cityName} - ${state || ""}`; // Exibe o estado no campo de entrada
+                suggestionsBox.innerHTML = ""; // Limpa as sugestões
+                citySearchByCoords(
+                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`,
+                    cityName,
+                    state // Passa o estado para a função
+                );
+            });
+        });
+    } catch (error) {
+        console.error("Erro ao buscar sugestões de cidades:", error);
+    }
+});
+
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
@@ -96,13 +151,13 @@ function errorCallback(error) {
     alert("Não foi possível obter sua localização.");
 }
 
-async function citySearchByCoords(apiUrl) {
+async function citySearchByCoords(apiUrl, cityName, state) {
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
         if (response.ok) {
-            updateWeatherInfo(data);
+            updateWeatherInfo(data, cityName, state);
         } else {
             alert("Não foi possível encontrar informações sobre sua localização.");
         }

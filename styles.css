@@ -82,3 +82,24 @@ body{
     margin-top: 20px;
 
 }
+
+.suggestions-box {
+    position: absolute;
+    background: grey;
+    border: 1px solid #000000;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 25%;
+    opacity: 1;
+    
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    color: #000000;
+}
+
+.suggestion-item:hover {
+    background: #f0f0f0;
+}
