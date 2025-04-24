@@ -1,12 +1,6 @@
 const KEY = "32976100515e39c6464b732c2b90fd75";
-const inputCity =  document.querySelector(".city-input");
-const searchButton = document.querySelector(".search-button");
+const inputCity = document.querySelector(".city-input");
 const suggestionsBox = document.querySelector(".suggestions-box"); // Crie um elemento no HTML para exibir as sugestões
-
-function clickButton() {
-    const input = document.querySelector(".city-input").value;
-    citySearch(input);
-}
 
 async function citySearch(city) {
     const geoApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${KEY}`;
@@ -45,12 +39,48 @@ function updateWeatherInfo(data, cityName, state) {
     document.querySelector(".img-weather").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
 }
 
-inputCity.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        clickButton();
-        console.log("Enter key pressed");
+let currentSuggestionIndex = -1; // Índice da sugestão atualmente selecionada
+
+inputCity.addEventListener("keydown", function (event) {
+    const suggestions = document.querySelectorAll(".suggestion-item");
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault(); // Impede o comportamento padrão de rolagem no campo de texto
+        if (suggestions.length > 0) {
+            // Incrementa o índice, mas não ultrapassa o número de sugestões
+            currentSuggestionIndex = (currentSuggestionIndex + 1) % suggestions.length;
+            updateSuggestionHighlight(suggestions);
+        }
+    } else if (event.key === "ArrowUp") {
+        event.preventDefault(); // Impede o comportamento padrão de rolagem no campo de texto
+        if (suggestions.length > 0) {
+            // Decrementa o índice, mas não ultrapassa o limite inferior
+            currentSuggestionIndex =
+                (currentSuggestionIndex - 1 + suggestions.length) % suggestions.length;
+            updateSuggestionHighlight(suggestions);
+        }
+    } else if (event.key === "Enter") {
+        if (currentSuggestionIndex >= 0 && suggestions.length > 0) {
+            event.preventDefault(); // Impede o envio do formulário (se houver)
+            suggestions[currentSuggestionIndex].click(); // Simula o clique na sugestão selecionada
+        } else {
+            const input = inputCity.value;
+            citySearch(input);
+        }
     }
 });
+
+// Função para destacar a sugestão selecionada
+function updateSuggestionHighlight(suggestions) {
+    suggestions.forEach((item, index) => {
+        if (index === currentSuggestionIndex) {
+            item.classList.add("highlight"); // Adiciona a classe de destaque
+            item.scrollIntoView({ block: "nearest" }); // Garante que a sugestão esteja visível
+        } else {
+            item.classList.remove("highlight"); // Remove o destaque das outras sugestões
+        }
+    });
+}
 
 inputCity.addEventListener("input", async function () {
     const query = inputCity.value.trim();
@@ -87,17 +117,17 @@ inputCity.addEventListener("input", async function () {
         document.querySelectorAll(".suggestion-item").forEach((item) => {
             item.addEventListener("click", function () {
                 const cityName = this.getAttribute("data-city");
-                const state = this.getAttribute("data-state"); // Adiciona o estado
+                const state = this.getAttribute("data-state");
                 const lat = this.getAttribute("data-lat");
                 const lon = this.getAttribute("data-lon");
 
                 // Atualiza o campo de entrada e busca o clima
-                inputCity.value = `${cityName} - ${state || ""}`; // Exibe o estado no campo de entrada
+                inputCity.value = `${cityName} - ${state || ""}`;
                 suggestionsBox.innerHTML = ""; // Limpa as sugestões
                 citySearchByCoords(
                     `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`,
                     cityName,
-                    state // Passa o estado para a função
+                    state
                 );
             });
         });

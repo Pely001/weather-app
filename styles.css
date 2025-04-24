@@ -44,20 +44,21 @@ body{
     width: calc(100% - 80px);
 }
 
-.search-button{
+/*.search-button{
     border: none;
     outline: none;
     padding: 10px;
-    border-radius: 40px;
+    border-radius: 4px;
     background-color: #7c7c7c2b;
     cursor: pointer;
     float: right;
+    margin-top: -40px;
 }
 
 .img-search{
     width: 20px;
     
-}
+}*/
 
 .city{
     color: #ffffff;
@@ -84,14 +85,18 @@ body{
 }
 
 .suggestions-box {
-    position: absolute;
+    position: absolute; /* Posiciona em relação ao .input-container */
     background: grey;
     border: 1px solid #000000;
     max-height: 200px;
     overflow-y: auto;
-    width: 25%;
+    width: 100%; /* Faz a caixa ocupar toda a largura do contêiner pai */
+    left: 0; /* Alinha à esquerda do contêiner pai */
+    top: 100%; /* Posiciona logo abaixo do campo de entrada */
     opacity: 1;
-    
+    z-index: 1000;
+    border-radius: 25px;
+    box-sizing: border-box;
 }
 
 .suggestion-item {
@@ -102,4 +107,14 @@ body{
 
 .suggestion-item:hover {
     background: #f0f0f0;
+}
+
+.suggestion-item.highlight {
+    background-color: #007bff; /* Cor de fundo para o destaque */
+    color: #ffffff; /* Cor do texto para o destaque */
+}
+
+.input-container {
+    position: relative; /* Define o contêiner como referência para a posição absoluta */
+    width: 100%; /* Garante que a largura seja consistente */
 }
