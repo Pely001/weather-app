@@ -21,6 +21,7 @@ async function citySearch(city) {
 
         if (weatherResponse.ok) {
             updateWeatherInfo(weatherData, name, state);
+            getForecast(lat, lon); // Adicione esta linha
         } else {
             alert(`Não foi possível encontrar informações sobre a cidade: ${city}`);
         }
@@ -167,6 +168,7 @@ async function successCallback(position) {
 
         if (weatherResponse.ok) {
             updateWeatherInfo(weatherData, name, state); // Passa o nome da cidade e o estado
+            getForecast(latitude, longitude); // Adicione esta linha
         } else {
             alert("Não foi possível obter informações sobre o clima da sua localização.");
         }
@@ -188,6 +190,9 @@ async function citySearchByCoords(apiUrl, cityName, state) {
 
         if (response.ok) {
             updateWeatherInfo(data, cityName, state);
+            // Extrai lat/lon da URL
+            const urlParams = new URLSearchParams(apiUrl.split('?')[1]);
+            getForecast(urlParams.get('lat'), urlParams.get('lon')); // Adicione esta linha
         } else {
             alert("Não foi possível encontrar informações sobre sua localização.");
         }
@@ -196,4 +201,37 @@ async function citySearchByCoords(apiUrl, cityName, state) {
         alert("Ocorreu um erro ao buscar a previsão do tempo.");
     }
 }
+
+async function getForecast(lat, lon) {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (response.ok) {
+        renderForecast(data);
+    }
+}
+
+function renderForecast(data) {
+    const forecastContainer = document.querySelector('.forecast-container');
+    // Agrupa por dia
+    const days = {};
+    data.list.forEach(item => {
+        const date = new Date(item.dt_txt);
+        const day = date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        if (!days[day] && date.getHours() === 12) { // Pega previsão do meio-dia
+            days[day] = item;
+        }
+    });
+    // Pega os próximos 4 dias
+    const daysArr = Object.entries(days).slice(0, 4);
+
+    forecastContainer.innerHTML = daysArr.map(([day, item]) => `
+        <div class="forecast-day">
+            <div>${day.replace('.', '')}</div>
+            <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="${item.weather[0].description}" />
+            <div>${Math.round(item.main.temp)}°C</div>
+        </div>
+    `).join('');
+}
+
 getLocation();
