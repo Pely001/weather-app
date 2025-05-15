@@ -1,9 +1,9 @@
-const KEY = "32976100515e39c6464b732c2b90fd75";
+const BACKEND_URL = "https://weather-app-server-production-e4c4.up.railway.app";
 const inputCity = document.querySelector(".city-input");
 const suggestionsBox = document.querySelector(".suggestions-box"); // Crie um elemento no HTML para exibir as sugestões
 
 async function citySearch(city) {
-    const geoApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${KEY}`;
+    const geoApiUrl = `${BACKEND_URL}/geo?city=${encodeURIComponent(city)}`;
     try {
         const geoResponse = await fetch(geoApiUrl);
         const geoData = await geoResponse.json();
@@ -14,7 +14,7 @@ async function citySearch(city) {
         }
 
         const { name, state, lat, lon } = geoData[0];
-        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`;
+        const weatherApiUrl = `${BACKEND_URL}/weather?lat=${lat}&lon=${lon}`;
 
         const weatherResponse = await fetch(weatherApiUrl);
         const weatherData = await weatherResponse.json();
@@ -92,7 +92,7 @@ inputCity.addEventListener("input", async function () {
         return;
     }
 
-    const geoApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${KEY}`;
+    const geoApiUrl = `${BACKEND_URL}/geo?city=${encodeURIComponent(query)}`;
     console.log("URL da API:", geoApiUrl); // Verifica a URL gerada
     try {
         const response = await fetch(geoApiUrl);
@@ -126,7 +126,7 @@ inputCity.addEventListener("input", async function () {
                 inputCity.value = `${cityName} - ${state || ""}`;
                 suggestionsBox.innerHTML = ""; // Limpa as sugestões
                 citySearchByCoords(
-                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`,
+                    `${BACKEND_URL}/weather?lat=${lat}&lon=${lon}`,
                     cityName,
                     state
                 );
@@ -149,7 +149,7 @@ async function successCallback(position) {
     const { latitude, longitude } = position.coords;
 
     // Chamada à API de geocodificação para obter o nome da cidade e o estado
-    const geoApiUrl = `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${KEY}`;
+    const geoApiUrl = `${BACKEND_URL}/reverse-geo?lat=${latitude}&lon=${longitude}`;
     try {
         const geoResponse = await fetch(geoApiUrl);
         const geoData = await geoResponse.json();
@@ -162,7 +162,7 @@ async function successCallback(position) {
         const { name, state } = geoData[0]; // Obtém o nome da cidade e o estado
 
         // Chamada à API de clima para obter os dados do tempo
-        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${KEY}&lang=pt_br&units=metric`;
+        const weatherApiUrl = `${BACKEND_URL}/weather?lat=${latitude}&lon=${longitude}`;
         const weatherResponse = await fetch(weatherApiUrl);
         const weatherData = await weatherResponse.json();
 
@@ -203,7 +203,7 @@ async function citySearchByCoords(apiUrl, cityName, state) {
 }
 
 async function getForecast(lat, lon) {
-    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${KEY}&lang=pt_br&units=metric`;
+    const url = `${BACKEND_URL}/forecast?lat=${lat}&lon=${lon}`;
     const response = await fetch(url);
     const data = await response.json();
     if (response.ok) {
