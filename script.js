@@ -223,10 +223,10 @@ function renderForecast(data) {
         }
     });
     // Pega os próximos 4 dias
-    const daysArr = Object.entries(days).slice(0, 4);
+    const daysArr = Object.entries(days).slice(0, 7);
 
     forecastContainer.innerHTML = daysArr.map(([day, item]) => `
-        <div class="forecast-day">
+        <div class="forecast-day" title="${item.weather[0].description}">
             <div>${day.replace('.', '')}</div>
             <img src="https://openweathermap.org/img/wn/${item.weather[0].icon}.png" alt="${item.weather[0].description}" />
             <div>${Math.round(item.main.temp)}°C</div>

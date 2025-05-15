@@ -121,22 +121,38 @@ body{
 
 .forecast-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    gap: 18px;
     margin-top: 20px;
-    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #222;
+    white-space: nowrap;
 }
 
 .forecast-day {
     background: #ffffff22;
     border-radius: 15px;
-    padding: 10px;
+    padding: 18px 14px;
     text-align: center;
     color: #fff;
-    min-width: 70px;
+    min-width: 110px;
+    max-width: 130px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.forecast-day:hover {
+    background: #ffffff44;
 }
 
 .forecast-day img {
-    width: 32px;
-    height: 32px;
-    margin: 5px 0;
+    width: 40px;
+    height: 40px;
+    margin: 10px 0;
 }
