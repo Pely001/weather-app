@@ -8,16 +8,17 @@
     "lint": "ng lint"
   },
   "dependencies": {
-    "@angular/common": "^16.0.0",
-    "@angular/core": "^16.0.0",
-    "@ionic/angular": "^7.0.0",
+    "@angular/common": "19.2.11",
+    "@angular/core": "19.2.11",
+    "@angular/forms": "19.2.11",
+    "@ionic/angular": "^7.8.6",
     "rxjs": "^7.0.0",
     "zone.js": "~0.13.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^16.0.0",
+    "@angular-devkit/build-angular": "^19.2.1",
     "@angular/cli": "^16.0.0",
-    "@angular/compiler-cli": "^16.0.0",
+    "@angular/compiler-cli": "19.2.11",
     "@ionic/angular-toolkit": "^9.0.0",
     "typescript": "~5.0.0"
   }
