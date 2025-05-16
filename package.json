@@ -1,0 +1,24 @@
+{
+  "name": "meu-projeto-ionic",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "ionic serve",
+    "build": "ionic build",
+    "test": "ng test",
+    "lint": "ng lint"
+  },
+  "dependencies": {
+    "@angular/common": "^16.0.0",
+    "@angular/core": "^16.0.0",
+    "@ionic/angular": "^7.0.0",
+    "rxjs": "^7.0.0",
+    "zone.js": "~0.13.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^16.0.0",
+    "@angular/cli": "^16.0.0",
+    "@angular/compiler-cli": "^16.0.0",
+    "@ionic/angular-toolkit": "^9.0.0",
+    "typescript": "~5.0.0"
+  }
+}
