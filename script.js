@@ -1,4 +1,4 @@
-const BACKEND_URL = "https://weather-app-server-production-e4c4.up.railway.app";
+const BACKEND_URL = "https://weather-app-server.fly.dev/";
 const inputCity = document.querySelector(".city-input");
 const suggestionsBox = document.querySelector(".suggestions-box"); // Crie um elemento no HTML para exibir as sugestões
 
